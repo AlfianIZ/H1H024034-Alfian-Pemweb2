@@ -13,6 +13,14 @@ func main() {
 		return c.SendString("Halo Pemrograman Web II")
 	})
 
+	app.Get("/api/info", func(c fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"aplikasi": "Latihan Fiber",
+			"versi": "1.0.0",
+			"status": "berjalan",
+		})
+	})
+
 	app.Get("/api/mahasiswa", func(c fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"NIM": "H1H024034",

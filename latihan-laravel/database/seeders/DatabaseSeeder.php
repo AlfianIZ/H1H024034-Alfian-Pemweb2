@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Mahasiswa;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,5 +22,11 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+    
+        $this->call([
+            ProgramStudiSeeder::class,
+            MatakuliahSeeder::class,
+        ]);
+        Mahasiswa::factory()->count(30)->create();
     }
 }

@@ -19,7 +19,6 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
         ]);
 
-        $data['password'] = Hash::make($data['password']);
         $data['peran'] = 'mahasiswa';
 
         $pengguna = User::create($data);
@@ -62,15 +61,18 @@ class AuthController extends Controller
 
         $token = $pengguna->createToken('token-perangkat', $kemampuan)->plainTextToken;
 
+        $pengguna->update(['terakhir_login' => now()]);
+
         return response()->json([
             'sukses' => true,
             'pesan' => 'Login berhasil',
             'data' => [
                 'pengguna' => [
-                    'id' => $pengguna->id,
-                    'nama' => $pengguna->name,
-                    'email' => $pengguna->email,
-                    'peran' => $pengguna->peran,
+                    'id'            => $pengguna->id,
+                    'nama'          => $pengguna->name,
+                    'email'         => $pengguna->email,
+                    'peran'         => $pengguna->peran,
+                    'terakhir_login' => $pengguna->terakhir_login,
                 ],
                 'token' => $token,
             ],
@@ -90,6 +92,32 @@ class AuthController extends Controller
                 'peran' => $pengguna->peran,
                 'kemampuan' => $pengguna->currentAccessToken()->abilities,
             ],
+        ]);
+    }
+
+    public function ubahPassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'kata_sandi_lama'  => ['required', 'string'],
+            'kata_sandi_baru'  => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
+        ]);
+
+        $pengguna = $request->user();
+
+        if (!Hash::check($request->kata_sandi_lama, $pengguna->password)) {
+            return response()->json([
+                'sukses' => false,
+                'pesan'  => 'Kata sandi lama tidak sesuai',
+            ], 422);
+        }
+
+        $pengguna->update([
+            'password' => $request->kata_sandi_baru,
+        ]);
+
+        return response()->json([
+            'sukses' => true,
+            'pesan'  => 'Kata sandi berhasil diubah',
         ]);
     }
 

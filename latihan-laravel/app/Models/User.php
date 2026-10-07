@@ -24,13 +24,14 @@ class User extends Authenticatable
      * @return array<string, string>
      *  
      */
-    protected $fillable = ['name','email','password','peran',];
+    protected $fillable = ['name', 'email', 'password', 'peran', 'terakhir_login'];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'terakhir_login'    => 'datetime',
+            'password'          => 'hashed',
         ];
     }
 }

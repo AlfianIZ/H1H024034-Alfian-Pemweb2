@@ -12,6 +12,7 @@ Route::post('/auth/login',  [AuthController::class, 'login'])->middleware('throt
 Route::middleware('auth:sanctum')->group(function () {
     // Auth & Profil
     Route::get('/auth/profil', [AuthController::class, 'profil']);
+    Route::put('/auth/password', [AuthController::class, 'ubahPassword']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/logout-semua', [AuthController::class, 'logoutSemua']);
 
@@ -24,6 +25,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/mahasiswa', [MahasiswaController::class, 'store']);
         Route::put('/mahasiswa/{mahasiswa}', [MahasiswaController::class, 'update']);
         Route::patch('/mahasiswa/{mahasiswa}', [MahasiswaController::class, 'update']);
-        Route::delete('/mahasiswa/{mahasiswa}', [MahasiswaController::class, 'destroy']);
     });
+
+    // Mahasiswa - Delete (Admin only)
+    Route::delete('/mahasiswa/{mahasiswa}', [MahasiswaController::class, 'destroy'])
+        ->middleware(['ability:mahasiswa:tulis', 'peran.admin']);
 });

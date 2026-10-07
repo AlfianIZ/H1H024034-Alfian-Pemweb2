@@ -18,8 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
-            'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+            'ability'    => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+            'abilities'  => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+            'peran.admin' => \App\Http\Middleware\PeranAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

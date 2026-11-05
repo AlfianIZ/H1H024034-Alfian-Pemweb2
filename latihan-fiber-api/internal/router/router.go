@@ -5,7 +5,6 @@ import (
 
 	"latihan-fiber-api/internal/config"
 	"latihan-fiber-api/internal/handler"
-	"latihan-fiber-api/internal/middleware"
 )
 
 func Daftarkan(app *fiber.App, konf config.Konfigurasi) {
@@ -18,8 +17,11 @@ func Daftarkan(app *fiber.App, konf config.Konfigurasi) {
 		})
 	})
 
-	mahasiswa := api.Group("/mahasiswa", middleware.KunciApi(konf.KunciApi))
-	mahasiswa.Get("/", handler.DaftarMahasiswa)
-	mahasiswa.Get("/nim/:nim", handler.DetailMahasiswaByNim)
-	mahasiswa.Get("/:id", handler.DetailMahasiswa)
+	mahasiswa := api.Group("/mahasiswa")
+
+    mahasiswa.Get("/", handler.DaftarMahasiswa)
+    mahasiswa.Post("/", handler.BuatMahasiswa)
+    mahasiswa.Get("/:id", handler.DetailMahasiswa)
+    mahasiswa.Put("/:id", handler.PerbaruiMahasiswa)
+    mahasiswa.Delete("/:id", handler.HapusMahasiswa)
 }

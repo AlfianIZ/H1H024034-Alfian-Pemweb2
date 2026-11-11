@@ -12,10 +12,10 @@ type Konfigurasi struct {
 	Lingkungan   string
 	KunciApi     string
 	DbHost       string
-    DbPort       string
-    DbNama       string
-    DbUser       string
-    DbSandi      string
+	DbPort       string
+	DbNama       string
+	DbUser       string
+	DbSandi      string
 }
 
 func Muat() Konfigurasi {
@@ -26,10 +26,10 @@ func Muat() Konfigurasi {
 		Lingkungan:   ambil("APP_ENV", "local"),
 		KunciApi:     ambil("API_KEY", ""),
 		DbHost:       ambil("DB_HOST", "127.0.0.1"),
-        DbPort:       ambil("DB_PORT", "3306"),
-        DbNama:       ambil("DB_NAME", "pemweb2_fiber"),
-        DbUser:       ambil("DB_USER", "root"),
-        DbSandi:      ambil("DB_PASS", ""),
+		DbPort:       ambil("DB_PORT", "3306"),
+		DbNama:       ambil("DB_NAME", "pemweb2_fiber"),
+		DbUser:       ambil("DB_USER", "root"),
+		DbSandi:      ambil("DB_PASS", ""),
 	}
 }
 

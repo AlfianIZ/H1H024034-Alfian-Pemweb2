@@ -1,35 +1,35 @@
 package config
 
 import (
-    "log"
+	"log"
 
-    "latihan-fiber-api/internal/model"
+	"latihan-fiber-api/internal/model"
 )
 
 func Migrasi() {
-    err := DB.AutoMigrate(&model.ProgramStudi{}, &model.Mahasiswa{})
-    if err != nil {
-        log.Fatal("Gagal menjalankan migrasi: ", err)
-    }
+	err := DB.AutoMigrate(&model.ProgramStudi{}, &model.Mahasiswa{}, &model.Matakuliah{})
+	if err != nil {
+		log.Fatal("Gagal menjalankan migrasi: ", err)
+	}
 
-    log.Println("Migrasi selesai")
+	log.Println("Migrasi selesai")
 }
 
 func DataAwal() {
-    var jumlah int64
+	var jumlah int64
 
-    DB.Model(&model.ProgramStudi{}).Count(&jumlah)
+	DB.Model(&model.ProgramStudi{}).Count(&jumlah)
 
-    if jumlah > 0 {
-        return
-    }
+	if jumlah > 0 {
+		return
+	}
 	daftar := []model.ProgramStudi{
-        {Kode: "TK", Nama: "Teknik Komputer", Jenjang: "S1"},
-        {Kode: "IF", Nama: "Informatika", Jenjang: "S1"},
-        {Kode: "TE", Nama: "Teknik Elektro", Jenjang: "S1"},
-    }
+		{Kode: "TK", Nama: "Teknik Komputer", Jenjang: "S1"},
+		{Kode: "IF", Nama: "Informatika", Jenjang: "S1"},
+		{Kode: "TE", Nama: "Teknik Elektro", Jenjang: "S1"},
+	}
 
-    DB.Create(&daftar)
+	DB.Create(&daftar)
 
-    log.Println("Data awal program studi dibuat")
+	log.Println("Data awal program studi dibuat")
 }

@@ -15,4 +15,3 @@ func KunciApi(kunciRahasia string) fiber.Handler {
 		return c.Next()
 	}
 }
-

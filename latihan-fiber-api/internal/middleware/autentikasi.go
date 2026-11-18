@@ -8,6 +8,7 @@ import (
 
 	"latihan-fiber-api/internal/auth"
 	"latihan-fiber-api/internal/config"
+	"latihan-fiber-api/internal/model"
 )
 
 func Autentikasi() fiber.Handler {
@@ -26,7 +27,17 @@ func Autentikasi() fiber.Handler {
 			return fiber.NewError(fiber.StatusUnauthorized, "Format header Authorization tidak sesuai")
 		}
 
-		klaim, err := auth.PeriksaToken(bagian[1], konf.JwtSecret)
+		tokenStr := bagian[1]
+
+		if config.DB != nil {
+			var ada int64
+			config.DB.Model(&model.DaftarHitamToken{}).Where("token = ?", tokenStr).Count(&ada)
+			if ada > 0 {
+				return fiber.NewError(fiber.StatusUnauthorized, "Token sudah dicabut (logout)")
+			}
+		}
+
+		klaim, err := auth.PeriksaToken(tokenStr, konf.JwtSecret)
 		if err != nil {
 			return fiber.NewError(fiber.StatusUnauthorized, "Token tidak valid atau sudah kedaluwarsa")
 		}

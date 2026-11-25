@@ -1,13 +1,29 @@
 import { useEffect, useState } from 'react'
-import { ambilDaftarMahasiswa } from '../api/layananMahasiswa'
+import { Link, useLocation } from 'react-router-dom'
+import { ambilDaftarMahasiswa, hapusMahasiswa } from '../api/layananMahasiswa'
+import { namaBackend } from '../api/layananAuth'
 
 export default function DaftarMahasiswa() {
+  const lokasi = useLocation()
   const [daftar, setDaftar] = useState([])
   const [meta, setMeta] = useState(null)
   const [halaman, setHalaman] = useState(1)
   const [cari, setCari] = useState('')
+  const [versi, setVersi] = useState(0)
   const [sedangMemuat, setSedangMemuat] = useState(false)
   const [pesanGalat, setPesanGalat] = useState('')
+  const [pesanSukses, setPesanSukses] = useState(lokasi.state?.pesan ?? '')
+  const [idMenghapus, setIdMenghapus] = useState(null)
+
+  useEffect(() => {
+    if (!pesanSukses) {
+      return undefined
+    }
+
+    const penunda = setTimeout(() => setPesanSukses(''), 4000)
+
+    return () => clearTimeout(penunda)
+  }, [pesanSukses])
 
   useEffect(() => {
     let dibatalkan = false
@@ -18,18 +34,18 @@ export default function DaftarMahasiswa() {
 
       try {
         const hasil = await ambilDaftarMahasiswa({
-          page: halaman,
+          halaman: halaman,
           cari: cari,
-          per_halaman: 10,
+          perHalaman: 10,
         })
 
         if (dibatalkan === false) {
           setDaftar(hasil.data)
           setMeta(hasil.meta)
         }
-        } catch (galat) {
+      } catch (galat) {
         if (dibatalkan === false) {
-          setPesanGalat('Gagal memuat data mahasiswa')
+          setPesanGalat(galat.pesan ?? 'Gagal memuat data mahasiswa')
         }
       } finally {
         if (dibatalkan === false) {
@@ -44,11 +60,49 @@ export default function DaftarMahasiswa() {
       dibatalkan = true
       clearTimeout(penunda)
     }
-  }, [halaman, cari])
+  }, [halaman, cari, versi])
+
+  async function tanganiHapus(mahasiswa) {
+    const setuju = window.confirm(
+      `Hapus data mahasiswa "${mahasiswa.nama}" (${mahasiswa.nim})? Tindakan ini tidak dapat dibatalkan.`
+    )
+
+    if (!setuju) {
+      return
+    }
+
+    setPesanGalat('')
+    setPesanSukses('')
+    setIdMenghapus(mahasiswa.id)
+
+    try {
+      const hasil = await hapusMahasiswa(mahasiswa.id)
+
+      setPesanSukses(hasil.pesan ?? 'Data mahasiswa berhasil dihapus')
+
+      if (daftar.length === 1 && halaman > 1) {
+        setHalaman(halaman - 1)
+      } else {
+        setVersi((nilai) => nilai + 1)
+      }
+    } catch (galat) {
+      setPesanGalat(galat.pesan ?? 'Gagal menghapus data mahasiswa')
+    } finally {
+      setIdMenghapus(null)
+    }
+  }
 
   return (
     <div style={{ maxWidth: 900, margin: '40px auto' }}>
-      <h1>Daftar Mahasiswa</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <h1 style={{ marginBottom: 4 }}>Daftar Mahasiswa</h1>
+          <p style={{ margin: 0, fontSize: 12, color: '#666' }}>
+            Backend aktif: {namaBackend}
+          </p>
+        </div>
+        <Link to="/mahasiswa/tambah">+ Tambah Mahasiswa</Link>
+      </div>
 
       <input
         type="search"
@@ -60,19 +114,24 @@ export default function DaftarMahasiswa() {
         }}
       />
 
-      {sedangMemuat && <p>Memuat data</p>}
+      {pesanSukses && <p style={{ color: 'green' }}>{pesanSukses}</p>}
 
       {pesanGalat && <p style={{ color: 'crimson' }}>{pesanGalat}</p>}
 
-      {sedangMemuat === false && daftar.length === 0 && <p>Data tidak ditemukan</p>}
+      {sedangMemuat && <p>Memuat data</p>}
+
+      {sedangMemuat === false && daftar.length === 0 && pesanGalat === '' && (
+        <p>Data tidak ditemukan</p>
+      )}
 
       <table border="1" cellPadding="8" style={{ width: '100%', marginTop: 16 }}>
         <thead>
           <tr>
             <th>NIM</th>
             <th>Nama</th>
-             <th>Angkatan</th>
+            <th>Angkatan</th>
             <th>IPK</th>
+            <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -82,6 +141,15 @@ export default function DaftarMahasiswa() {
               <td>{mahasiswa.nama}</td>
               <td>{mahasiswa.angkatan}</td>
               <td>{mahasiswa.ipk}</td>
+              <td>
+                <button
+                  type="button"
+                  onClick={() => tanganiHapus(mahasiswa)}
+                  disabled={idMenghapus === mahasiswa.id}
+                >
+                  {idMenghapus === mahasiswa.id ? 'Menghapus...' : 'Hapus'}
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -94,12 +162,12 @@ export default function DaftarMahasiswa() {
           </button>
 
           <span style={{ margin: '0 12px' }}>
-            Halaman {meta.current_page} dari {meta.last_page}
+            Halaman {meta.halaman} dari {meta.totalHalaman} ({meta.total} data)
           </span>
 
           <button
             onClick={() => setHalaman(halaman + 1)}
-            disabled={meta.current_page >= meta.last_page}
+            disabled={meta.halaman >= meta.totalHalaman}
           >
             Berikutnya
           </button>

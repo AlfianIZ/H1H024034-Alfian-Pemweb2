@@ -1,7 +1,14 @@
 import axios from 'axios'
 
+// Satu-satunya pengaturan untuk memilih backend: VITE_API_BACKEND=laravel|fiber
+const backendTerpilih = (import.meta.env.VITE_API_BACKEND ?? 'fiber').toLowerCase()
+
+const baseURL = backendTerpilih === 'laravel'
+  ? import.meta.env.VITE_API_LARAVEL
+  : import.meta.env.VITE_API_FIBER
+
 const klien = axios.create({
-  baseURL: import.meta.env.VITE_API_LARAVEL,
+  baseURL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -14,7 +21,7 @@ klien.interceptors.request.use((konfigurasi) => {
 
   if (token) {
     konfigurasi.headers.Authorization = `Bearer ${token}`
-    }
+  }
 
   return konfigurasi
 })
@@ -22,7 +29,10 @@ klien.interceptors.request.use((konfigurasi) => {
 klien.interceptors.response.use(
   (respons) => respons,
   (galat) => {
-    if (galat.response && galat.response.status === 401) {
+    const endpointLogin = (galat.config?.url ?? '').includes('/auth/login')
+
+    // Jangan redirect saat login gagal, agar pesan galat tetap tampil.
+    if (galat.response && galat.response.status === 401 && !endpointLogin) {
       sessionStorage.removeItem('token')
       window.location.href = '/login'
     }
@@ -32,3 +42,4 @@ klien.interceptors.response.use(
 )
 
 export default klien
+export { backendTerpilih }

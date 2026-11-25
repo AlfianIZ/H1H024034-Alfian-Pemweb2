@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { login } from '../api/layananAuth'
+import { login, namaBackend } from '../api/layananAuth'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -19,15 +19,11 @@ export default function Login() {
     try {
       const hasil = await login(email, kataSandi)
 
-      sessionStorage.setItem('token', hasil.data.token)
+      sessionStorage.setItem('token', hasil.token)
 
       navigasi('/mahasiswa')
     } catch (galat) {
-      if (galat.response) {
-        setPesanGalat(galat.response.data.pesan)
-      } else {
-        setPesanGalat('Tidak dapat menghubungi server')
-      }
+      setPesanGalat(galat.pesan ?? 'Tidak dapat menghubungi server')
     } finally {
       setSedangMemuat(false)
     }
@@ -36,6 +32,8 @@ export default function Login() {
   return (
     <div style={{ maxWidth: 360, margin: '80px auto' }}>
       <h1>Masuk</h1>
+
+      <p style={{ fontSize: 12, color: '#666' }}>Backend aktif: {namaBackend}</p>
 
       {pesanGalat && <p style={{ color: 'crimson' }}>{pesanGalat}</p>}
 

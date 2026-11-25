@@ -5,10 +5,26 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MahasiswaResource;
 use App\Models\ProgramStudi;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ProgramStudiController extends Controller
 {
+    /**
+     * Mendapatkan daftar program studi.
+     */
+    public function index(): JsonResponse
+    {
+        $daftar = ProgramStudi::query()
+            ->orderBy('kode')
+            ->get(['id', 'kode', 'nama', 'jenjang']);
+
+        return response()->json([
+            'sukses' => true,
+            'data' => $daftar,
+        ]);
+    }
+
     /**
      * Mendapatkan daftar mahasiswa berdasarkan program studi dengan pagination.
      */

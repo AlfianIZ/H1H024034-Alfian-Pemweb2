@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MahasiswaController;
+use App\Http\Controllers\Api\ProgramStudiController;
 use Illuminate\Support\Facades\Route;
 
 // Public Auth Routes
@@ -15,6 +16,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/auth/password', [AuthController::class, 'ubahPassword']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/logout-semua', [AuthController::class, 'logoutSemua']);
+
+    // Program Studi
+    Route::get('/program-studi', [ProgramStudiController::class, 'index']);
 
     // Mahasiswa - Read Access
     Route::get('/mahasiswa', [MahasiswaController::class, 'index']);

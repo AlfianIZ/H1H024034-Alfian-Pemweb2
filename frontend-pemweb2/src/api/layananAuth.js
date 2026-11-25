@@ -1,22 +1,15 @@
-import klien from './klien'
+import { backend } from './backend'
 
-export async function login(email, kataSandi) {
-  const respons = await klien.post('/auth/login', {
-    email: email,
-    password: kataSandi,
-  })
-
-  return respons.data
+export function login(email, kataSandi) {
+  return backend.login(email, kataSandi)
 }
 
-export async function ambilProfil() {
-  const respons = await klien.get('/auth/profil')
-
-  return respons.data
+export function ambilProfil() {
+  return backend.ambilProfil()
 }
 
-export async function logout() {
-  const respons = await klien.post('/auth/logout')
-
-  return respons.data
+export function logout() {
+  return backend.logout()
 }
+
+export { namaBackend } from './backend'

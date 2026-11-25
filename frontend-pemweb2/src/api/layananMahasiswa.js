@@ -1,25 +1,21 @@
-import klien from './klien'
+import { backend } from './backend'
 
-export async function ambilDaftarMahasiswa(parameter) {
-  const respons = await klien.get('/mahasiswa', { params: parameter })
-
-  return respons.data
+export function ambilDaftarMahasiswa(parameter) {
+  return backend.daftarMahasiswa(parameter)
 }
 
-export async function ambilDetailMahasiswa(id) {
-  const respons = await klien.get(`/mahasiswa/${id}`)
-
-  return respons.data
+export function ambilDetailMahasiswa(id) {
+  return backend.detailMahasiswa(id)
 }
 
-export async function simpanMahasiswa(data) {
-  const respons = await klien.post('/mahasiswa', data)
-
-  return respons.data
+export function simpanMahasiswa(data) {
+  return backend.simpanMahasiswa(data)
 }
 
-export async function hapusMahasiswa(id) {
-  const respons = await klien.delete(`/mahasiswa/${id}`)
+export function hapusMahasiswa(id) {
+  return backend.hapusMahasiswa(id)
+}
 
-  return respons.data
+export function ambilDaftarProgramStudi() {
+  return backend.daftarProgramStudi()
 }
